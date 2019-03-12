@@ -46,30 +46,31 @@ public class PerceptronLearnerTest {
         
         //create the positive list
         List<PVector> pos = PVector.listOf(new Integer[][]{
-            // e.g. {2,  1}, {2,  3}, {3, -1}, {3,  2}
+            {2,  1}, {2,  3}, {3, -1}, {3,  2}
         });
         
         //create the negative list
         List<PVector> neg = PVector.listOf(new Integer[][]{
-            // e.g. {0, -2}, {1,  0}, {2, -1}, {3, -3}
+            {0, -2}, {1,  0}, {2, -1}, {3, -3}
         });
         
         //create the queries list
         List<PVector> q = PVector.listOf(new Integer[][]{
-//                {0, -2}, {1,  0}, {2, -1}, {3, -3},
-//                {2,  1}, {2,  3}, {3, -1}, {3,  2},
+            {0, -2}, {1,  0}, {2, -1}, {3, -3},
+            {2,  1}, {2,  3}, {3, -1}, {3,  2},
         });
         
         PerceptronLearner instance = new PerceptronLearner();
         
         //the expected result
-        String expResult = "4 ----++++";
-        
+        String expResult = "0";
+
+
         //the actual result
         boolean useBias=true;
-        int maxNumberOfIterations=1000;
+        int maxNumberOfIterations=0;
         String result = instance.execute(pos, neg, useBias, maxNumberOfIterations, q);
-        
+
         //test whether both are equal
         assertEquals(expResult, result);
     }

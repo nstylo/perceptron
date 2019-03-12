@@ -22,30 +22,29 @@ public class PerceptronLearner {
         // initialize output-string
         String output = "";
 
-        // if there is a need for a bias unit, append the input sets with an extra field with value 1
+        // if there is a need for a bias unit, appendCoord the input sets with an extra field with value 1
         if (bias) {
-            positive = append(positive);
-            negative = append(negative);
-            queries = append(queries);
+            appendCoord(positive, 1);
+            appendCoord(negative, 1);
+            appendCoord(queries, 1);
         }
 
         // learn the Perceptron with the given max iteration count
         PVector weights = perceptronLearning(positive, negative, maxIterations);
 
-        // append the iteration count and return if weights == null, i.e. if iter >= maxIterations
-        output = output.concat(iter.toString());
+        // appendCoord the iteration count and return if weights == null, i.e. if iter >= maxIterations
+        output += iter;
         if (weights == null) {
             return output;
         }
 
         // for each vector v to classify, do if dot(v, n) <= 0 then classify negatively, else positively
-        output = output.concat(" ");
-        for (int i = 0; i < queries.size(); i++) {
-            PVector v = queries.get(i);
+        output += " ";
+        for (PVector v : queries) {
             if (weights.dotProduct(v) <= 0) {
-                output = output.concat("-");
+                output += "-";
             } else {
-                output = output.concat("+");
+                output += "+";
             }
         }
 
@@ -62,49 +61,56 @@ public class PerceptronLearner {
      * @return the Vector of weights used for classification or null if iter >= maxIterations
      */
     private PVector perceptronLearning(List<PVector> positive, List<PVector> negative, Integer maxIterations) {
-        // weights vector -> the output
-        PVector weights = new PVector();
         // size of the vectors, we assume all input vectors have the same size
         int n = positive.get(0).size();
 
-        // construct the initial weights vector
-        for (int dimensionality = n; dimensionality > 0; dimensionality--) {
-            weights = weights.addCoord(1);
-        }
+        // weights vector -> the output
+        PVector weights = PVector.constant(n, 1);
 
-        boolean correct;
+        boolean correct = false;
         iter = 0;
-        // while we haven't correctly classified or we have reached maxIterations, adjust weights
-        do {
+        // while we haven't correctly classified and we have reached maxIterations, adjust weights
+        while (!correct && iter < maxIterations) {
             iter++;
             correct = true;
+
+            // classify positive
             for (PVector v : positive) {
                 if (weights.dotProduct(v) <= 0) {
                     weights = weights.add(v);
                     correct = false;
                 }
             }
+
+            // classify negative
             for (PVector v : negative) {
                 if (weights.dotProduct(v) > 0) {
                     weights = weights.subtract(v);
                     correct = false;
                 }
             }
-        } while (!correct || iter >= maxIterations);
+        }
 
-        // if we exceed maxIterations, return null
+        // if we meet maxIterations, return null
         if (iter >= maxIterations) {
-            weights = null;
+            return null;
         }
 
         return weights;
     }
 
-    private List<PVector> append(List<PVector> vectors) {
+    /**
+     * appends vectors in a list with another coordinate with a given value
+     *
+     * @param vectors list of vectors
+     * @param val     value to assign the new coordinate
+     * @return the input list with appended vectors
+     */
+    private void appendCoord(List<PVector> vectors, int val) {
+        // for each of the vectors, add a new coordinate with value
         for (int i = 0; i < vectors.size(); i++) {
-            PVector v = vectors.get(i).addCoord(1);
+            PVector v = vectors.get(i).addCoord(val);
             vectors.set(i, v);
         }
-        return vectors;
     }
 }
